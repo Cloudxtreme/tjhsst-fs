@@ -1,27 +1,28 @@
-#!/bin/sh
-if [ "$EUID" -ne 0 ]
-  then echo "You must run as root to mount filesystems"
+#!/bin/bash
+if [ "$EUID" -ne 0 ]; then
+  echo "You must run as root to mount filesystems"
   exit
 fi
 type sshfs >/dev/null 2>&1 || { echo >&2 "This requires SSHFS but it's not installed. Aborting."; exit 1; }
-// Add Stuff Here
 
 echo "Enter Your Username:"
 read username
 
-echo "Enter What You Would Like To Connect To [\"local\"|\"csl\"|\"all\"]:"
-read connection_type
-if [(connection_type -ne "local")&&(connection_type -ne "csl")&&(connection_type -ne "all")]
-  then echo "Invalid Connection Type"
-  exit
-fi
+echo ""
 
-connect_local() {
+echo "Enter What You Would Like To Connect To [\"local\"|\"csl\"]:"
+read connection_type
+
+echo ""
+
+if test "$connection_type" = "local"; then
+  echo "Connecting To LOCAL"
   mkdir /tmp/tjhsst_local
   sshfs $username@tj03.local.tjhsst.edu:/ /tmp/tjhsst_local -ocache=no -onolocalcaches -ovolname="TJHSST LOCAL"
-}
-
-connect_csl() {
+elif test $connection_type = "csl"; then
+  echo "Connecting To CSL"
   mkdir /tmp/tjhsst_csl
   sshfs $username@remote.tjhsst.edu:/ /tmp/tjhsst_csl -ocache=no -onolocalcaches -ovolname="TJHSST CSL"
-}
+else
+  echo "Invalid Connection Type"
+fi
